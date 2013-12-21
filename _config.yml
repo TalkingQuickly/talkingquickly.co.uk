@@ -1,0 +1,14 @@
+name: talkingquickly
+description: rails, stress free deployment, climbing, thinking
+meta_description: "Blog by Ben Dixon, Ruby on Rails Developer, about rails, devops, climbing at startups"
+
+permalink: /:year/:month/:title
+
+markdown: redcarpet
+pygments: true
+logo: false
+paginate: 15
+
+# Details for the RSS feed generator
+url:            'http://www.talkingquickly.co.uk'
+author:         'Ben Dixon'
