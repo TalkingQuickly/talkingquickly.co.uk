@@ -6,3 +6,4 @@ deployment-updates-thank-you-1 : /deployment-updates-thank-you-1.html
 feed : /rss.xml
 feed/rdf : /rss.xml
 feed/atom : /rss.xml
+resources-for-learning-to-deploy-rails-applications : /resources-for-learning-to-deploy-rails-applications.html
