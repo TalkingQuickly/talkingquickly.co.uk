@@ -1,7 +1,7 @@
 ---
 layout : post
 title: "Deploying Multiple Rails Applications to a Single VPS"
-date: 2013-11-06 17:48:00
+date: 2013-11-06 19:03:00
 categories: rails devops
 biofooter: false
 bookfooter: true
