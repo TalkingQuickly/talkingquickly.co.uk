@@ -1,7 +1,7 @@
 # Overview
 
 This is the repository for the blog talkingquickly.co.uk covering Rails,
-Deployment and Startups amoung other things.
+Deployment and Startups among other things.
 
 ## License
 
