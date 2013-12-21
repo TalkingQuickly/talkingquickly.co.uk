@@ -25,6 +25,6 @@ href="http://www.shopofme.com" target="_blank">shop of me</a>.
 I'm sometimes available for short pieces of contract development or
 devops work and always interested in chatting to new
 people. You can find me on twitter as <a
-href="http://www.talkingquickly.co.uk"
+href="http://www.twitter.com/talkingquickly"
 target="_blank">@talkingquickly</a> or by emailing
 <a href="mailto:ben@talkingquickly.co.uk" >ben@talkingquickly.co.uk</a>.
