@@ -3,3 +3,6 @@ about : /about.html
 hills-bede-portfolio : /about.html
 deployment-updates-sample-chapter : /deployment-updates-sample-chapter.html
 deployment-updates-thank-you-1 : /deployment-updates-thank-you-1.html
+feed : /rss.xml
+feed/rdf : /rss.xml
+feed/atom : /rss.xml
