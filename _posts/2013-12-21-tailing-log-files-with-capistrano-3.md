@@ -14,7 +14,7 @@ machine(s). In this post I'll cover how to do this with Capistrano 3.
 In Capistrano 2, our streaming code would look something like this:
 
 ``` ruby
-namespace :logging do
+namespace :logs do
   desc "tail rails logs"
   task :tail_rails, :roles => :app do
     trap("INT") { puts 'Interupted'; exit 0; }
@@ -29,7 +29,7 @@ end
 In Capistrano 3, it's even simpler:
 
 ``` ruby
-namespace :logging do
+namespace :logs do
   desc "tail rails logs" 
   task :tail_rails do
     on roles(:app) do
@@ -59,7 +59,7 @@ namespace :logs do
   task :tail, :file do |t, args|
     if args[:file]
       on roles(:app) do
-        execute "tail -f #{shared_path}/log/unicorn.log"
+        execute "tail -f #{shared_path}/log/#{args[:file]}.log"
       end
     else
       puts "please specify a logfile e.g: 'rake logs:tail[logfile]"
