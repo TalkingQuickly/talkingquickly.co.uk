@@ -96,7 +96,7 @@ Sit back, relax and enjoy. This process takes quite a while and once it’s comp
 ## Next Steps
 
 You can read more about using Capistrano to deploy to VPS configured
-with this method in [this post](/2013/09/using-chef-to-provision-a-rails-and-postgres-server/)
+with this method in [this post](/2013/11/deploying-multiple-rails-apps-to-a-single-vps)
 
 Any queries or corrections you can find me on twitter;
 [@talkingquickly](http://www.twitter.com/talkingquickly)
