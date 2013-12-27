@@ -10,7 +10,7 @@ One of the most popular posts on this blog is on how to use Capistrano 2
 to deploy Rails applications to a VPS, including the scenario when you
 want to run several different applications on the same one. Capistrano 3
 has now been released and having upgraded several large production
-applications to use it, feel that there are a lot of worthwhile
+applications to use it, I've found there to be a lot of worthwhile
 improvements over v2. This post explains, with sample code, how to use
 Capistrano 3 to deploy one or several Rails applications to a VPS.
 
@@ -34,11 +34,7 @@ By simply adding the Capistrano gem to the applications Gemfile and
 following the instructions in the Readme, it's possible to get a simple,
 working Capistrano configuration. 
 
-This approach is an opinionated layer on top of that which has performed
-well for me in production environments, it assumes thate ach application
-should be responsible for managing all configuration specific to its 
-operation. This includes virtual host and config files, log rotation
-defintiions and monit configurations.
+This approach adds some convenience tasks and conventions on top of that which have performed well for me in production environments. It assumes that each application should be responsible for managing all configuration specific to its operation. This includes virtual host and config files, log rotation defintiions and monit configurations.
 
 ## The Stack
 
@@ -78,7 +74,7 @@ gem 'capistrano-rbenv', "~> 2.0"
 
 As you can see, Capistrano 3 splits out a lot of app specific functionality into separate gems. This increased focus on modularity is a theme throughout the version 3 rewrite.
 
-Then run `bundle install` if you're adding capistrano 3 for the first time or `bundle update capistrano` if you're upgrading. You may need to do some standard Gemfile juggling if you're updating and there are dependency conflicts.
+Then run `bundle install` if you're adding capistrano 3 for the first time or `bundle update capistrano` if you're upgrading. You may need to do some of the usual Gemfile juggling if you're updating and there are dependency conflicts.
 
 2) Assuming you've archived off any legacy Capistrano configs, you can now run:
 
@@ -101,7 +97,7 @@ Which generates the following files and directory structure:
             └── tasks
 ```
 
-The configuration for this tutorial is available on [github](https://github.com/TalkingQuickly/capistrano-3-rails-template). I suggest cloning this repository or downloading [the zip](https://github.com/TalkingQuickly/capistrano-3-rails-template/archive/master.zip) and copying these files into your project as you read through the following steps.
+The source for this tutorial is available on [github](https://github.com/TalkingQuickly/capistrano-3-rails-template). I suggest cloning this repository or downloading [the zip](https://github.com/TalkingQuickly/capistrano-3-rails-template/archive/master.zip) and copying these files into your project as you read through the following steps.
 
 3) Add the following line at the end of `Capfile`
 
@@ -118,9 +114,9 @@ require 'capistrano/bundler'
 require 'capistrano/rbenv'
 ```
 
-Which will include the capistrano bundler helpers to ensure gems are automatically installed when you deploy. It will also include the rbenv helpers which ensure the rbenv specified ruby is used when executing commands remotely rather than the system default.
+Which will include the capistrano bundler tasks to ensure gems are automatically installed when you deploy. It will also include the rbenv helpers which ensure the rbenv specified ruby is used when executing commands remotely rather than the system default.
 
-4) The aim is to keep as much common configuration in `config/deploy.rb` as possible and putting only stage specific configuration in the stage files like `config/deploy/production.rb`.
+4) This approach aims is to keep as much common configuration in `config/deploy.rb` as possible and put only minimal stage specific configuration in the stage files like `config/deploy/production.rb`.
 
 To begin with enter the following in `deploy.rb`
 
@@ -138,7 +134,7 @@ set :rbenv_ruby, '2.0.0-p0'
 set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rbenv_ruby)} #{fetch(:rbenv_path)}/bin/rbenv exec"
 set :rbenv_map_bins, %w{rake gem bundle ruby rails}
 
-# how many old releases do we want to keep, not much
+# how many old releases do we want to keep
 set :keep_releases, 5
 
 # files we want symlinking to specific entries in shared.
@@ -229,13 +225,15 @@ set :enable_ssl, false
 
 The important variables to update are the server hostname and the user to connect to this server as.
 
+When you run `cap some_stage_name some_task`, Capistrano will look for a file `config/deploy/some_stage_name.rb` and load it after `deploy.rb`.
+
 You can create as many of these files as you want, for example an additional `staging` configuration.
 
 6) Config Files
 
 Capistrano uses a folder called `shared` to manage files and directories that should persist across releases. The key one is `shared/config` which should contain configuration files which should persist across deploys.
 
-If we take as an example the traditional `database.yml` file whch Activerecord uses to determine the database and credentails requried for accessing the database for the current environment.
+If we take as an example the traditional `database.yml` file whch ActiveRecord uses to determine the database and credentials required for accessing the database for the current environment.
 
 We do not want to keep this file in version control since our production database details would be available to anyone who had access to the repository. With Capistrano 3 we create a `database.yml` file in `shared/config` and the following: 
 
@@ -271,9 +269,9 @@ set(:executable_config_files, %w(
 ))
 ``` 
 
-Is a custom extension to the standard Capistrano 3 approach to configuration files which makes the initial creation of these files easier which adds the task `deploy:setup_config`.
+Is a custom extension to the standard Capistrano 3 approach to configuration files which makes the initial creation of these files easier by adding the task `deploy:setup_config`.
 
-When this task is run, for each of the files defined in `:config_files`, it will first look for a corresponding .erb file (so for nginx.conf it would look for nginx.conf.erb) in `config/deploy/#{application}_#{rails_env}/`. If it is not found in there it would look for it in `config/deploy/shared/. Once it finds the correct source file, it will parse the erb and then copy it to the `config` directory in your remote shared path.
+When this task is run, for each of the files defined in `:config_files`, it will first look for a corresponding .erb file (so for nginx.conf it would look for nginx.conf.erb) in `config/deploy/#{application}_#{rails_env}/`. If it is not found in there it would look for it in `config/deploy/shared/. Once it finds the correct source file, it will parse the erb and then copy the result to the `config` directory in your remote shared path.
 
 This allows you to define your common config files in `shared` which will be used by all stages (staging & production for example) while still allowing for some templates to differ between stages.
 
@@ -297,7 +295,7 @@ vim database.yml
 
 And enter the details of the database the app should connect to.
 
-8) You're now ready to deploy, return to your local terminal, ensure that you've committed your changes pushed changes to the remote repository and enter:
+8) You're now ready to deploy. Return to your local terminal, ensure that you've committed your changes pushed changes to the remote repository and enter:
 
 ``` bash
 cap production deploy
@@ -311,4 +309,4 @@ This configuration is based heavily on the vanilla capistrano configuration, wit
 
 I strongly recommend forking my sample configuration and tailoring it to fit the kind of applications you develop. I usually end up with a few different configurations, each of which are used for either a particular type of personal project or all of a particular clients applications.
 
-Any queries or suggestions are welcomed, I'm <a href="http://www.twitter.com/talkingquickly" target="_blank">@talkingquickly</a> on twitter. Pull requests for the sample configuration are also welcomed.
+Any queries or suggestions are welcomed, I'm <a href="http://www.twitter.com/talkingquickly" target="_blank">@talkingquickly</a> on twitter. I'm also happy to include pull requests to the sample configuration.
