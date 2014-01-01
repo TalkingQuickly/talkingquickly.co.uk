@@ -204,3 +204,5 @@ Personally I prefer a hybrid. I generally add the vagrant user to the sudoers li
 ## Conclusion
 
 If you use Chef Solo, this configuration allows you to use Vagrant to test cookbooks using local, disposable VM’s through a process that is almost identical to the production workflow. For more on Vagrant, such as how to forward ports, manage shared folders and package images for distribution, see the excellant Vagrant documentation at: <http://docs.vagrantup.com/v2/getting-started/>
+
+{% include also-read-rails.html %}

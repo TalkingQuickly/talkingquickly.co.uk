@@ -105,3 +105,5 @@ rake 'logs:tail[production]'
 ```
 
 Which works for any rake tasks when invoked using ZSH.
+
+{% include also-read-rails.html %}

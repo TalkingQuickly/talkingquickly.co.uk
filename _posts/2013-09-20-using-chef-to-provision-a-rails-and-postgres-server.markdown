@@ -100,3 +100,5 @@ with this method in [this post](/2013/11/deploying-multiple-rails-apps-to-a-sing
 
 Any queries or corrections you can find me on twitter;
 [@talkingquickly](http://www.twitter.com/talkingquickly)
+
+{% include also-read-rails.html %}

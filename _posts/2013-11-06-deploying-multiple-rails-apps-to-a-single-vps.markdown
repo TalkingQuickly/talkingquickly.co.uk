@@ -185,3 +185,5 @@ cap production deploy
 ## Additional Applications
 
 Using this approach, each application is responsible for maintaing its own configuration and nginx will proxy requests back to the correct unicorn workers depending on the domain which is accessed so the only limit to the number of rails applications which can be deployed to a single server is the resources available.
+
+{% include also-read-rails.html %}
