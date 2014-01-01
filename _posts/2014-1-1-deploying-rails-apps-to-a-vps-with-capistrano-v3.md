@@ -1,14 +1,14 @@
 ---
 layout : post
 title: "Deploying Rails apps to a VPS with Capistrano V3"
-date: 2013-12-22 14:06:00
+date: 2014-1-1 19:36:00
 categories: rails devops
 biofooter: false
 bookfooter: true
 ---
 One of the most popular posts on this blog is on how to use Capistrano 2
 to deploy Rails applications to a VPS, including the scenario when you
-want to run several different applications on the same one. Capistrano 3
+want to run several different applications on the same server. Capistrano 3
 has now been released and having upgraded several large production
 applications to use it, I've found there to be a lot of worthwhile
 improvements over v2. This post explains, with sample code, how to use
@@ -27,14 +27,6 @@ something most Rails developers have some familiarity with.
 * It uses SSHkit for lower level functions around connecting and
 interacting with remote machines. This makes writing convenience tasks
 which do things like streaming logs or checking processes, much easier.
-
-## Design decisions
-
-By simply adding the Capistrano gem to the applications Gemfile and
-following the instructions in the Readme, it's possible to get a simple,
-working Capistrano configuration. 
-
-This approach adds some convenience tasks and conventions on top of that which have performed well for me in production environments. It assumes that each application should be responsible for managing all configuration specific to its operation. This includes virtual host and config files, log rotation defintiions and monit configurations.
 
 ## The Stack
 
@@ -71,8 +63,6 @@ gem 'capistrano-bundler'
 # if you are using RVM
 gem 'capistrano-rbenv', "~> 2.0" 
 ```
-
-As you can see, Capistrano 3 splits out a lot of app specific functionality into separate gems. This increased focus on modularity is a theme throughout the version 3 rewrite.
 
 Then run `bundle install` if you're adding capistrano 3 for the first time or `bundle update capistrano` if you're upgrading. You may need to do some of the usual Gemfile juggling if you're updating and there are dependency conflicts.
 
@@ -166,6 +156,28 @@ set(:executable_config_files, %w(
   unicorn_init.sh
 ))
 
+# files which need to be symlinked to other parts of the
+# filesystem. For example nginx virtualhosts, log rotation
+# init scripts etc.
+set(:symlinks, [
+  {
+    source: "nginx.conf",
+    link: "/etc/nginx/sites-enabled/#{fetch(:full_app_name)}"
+  },
+  {
+    source: "unicorn_init.sh",
+    link: "/etc/init.d/unicorn_#{fetch(:full_app_name)}"
+  },
+  {
+    source: "log_rotation",
+   link: "/etc/logrotate.d/#{fetch(:full_app_name)}"
+  },
+  {
+    source: "monit",
+    link: "/etc/monit/conf.d/#{fetch(:full_app_name)}.conf"
+  }
+])
+
 
 # this:
 # http://www.capistranorb.com/documentation/getting-started/flow/
@@ -193,7 +205,7 @@ This section:
 set :tests, ["spec"]
 ```
 
-Provides a simple way to run specs before dpeloying, if the specs fail, the deployment will be halted. If you already have a fully blown continuous integration system setup (or don't want to run specs at all), this can be set to an empty array.
+Provides a simple way to run specs before deploying, if the specs fail, the deployment will be halted. If you already have a fully blown continuous integration system setup (or don't want to run specs at all), this can be set to an empty array.
 
 5) Now edit the stage specific settings in `production.rb`. By default it looks like this:
 
@@ -231,11 +243,9 @@ You can create as many of these files as you want, for example an additional `st
 
 6) Config Files
 
-Capistrano uses a folder called `shared` to manage files and directories that should persist across releases. The key one is `shared/config` which should contain configuration files which should persist across deploys.
+Capistrano uses a folder called `shared` to manage files and directories that should persist across releases. The key one is `shared/config` which contains configuration files which are required to persist across deploys.
 
-If we take as an example the traditional `database.yml` file whch ActiveRecord uses to determine the database and credentials required for accessing the database for the current environment.
-
-We do not want to keep this file in version control since our production database details would be available to anyone who had access to the repository. With Capistrano 3 we create a `database.yml` file in `shared/config` and the following: 
+To integrate with the Rails directory structure, the following:
 
 ``` ruby
 # files we want symlinking to specific entries in shared.
@@ -295,6 +305,20 @@ vim database.yml
 
 And enter the details of the database the app should connect to.
 
+Also take this opporunity to restart Nginx so that it will pick up the new virtualhost which was added by `deploy:setup_config`:
+
+``` bash
+sudo /etc/init.d/nginx restart
+```
+
+or
+
+``` bash
+sudo nginx -s reload
+```
+
+if you prefer.
+
 8) You're now ready to deploy. Return to your local terminal, ensure that you've committed your changes pushed changes to the remote repository and enter:
 
 ``` bash
@@ -310,3 +334,5 @@ This configuration is based heavily on the vanilla capistrano configuration, wit
 I strongly recommend forking my sample configuration and tailoring it to fit the kind of applications you develop. I usually end up with a few different configurations, each of which are used for either a particular type of personal project or all of a particular clients applications.
 
 Any queries or suggestions are welcomed, I'm <a href="http://www.twitter.com/talkingquickly" target="_blank">@talkingquickly</a> on twitter. I'm also happy to include pull requests to the sample configuration.
+
+{% include also-read-rails.html %}
