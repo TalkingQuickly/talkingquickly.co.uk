@@ -1,6 +1,6 @@
 ---
 layout : post
-title: "Deploying Rails apps to a VPS with Capistrano V3"
+title: "Capistrano 3 Tutorial"
 date: 2014-1-1 19:36:00
 categories: rails devops
 biofooter: false
